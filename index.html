@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown website thingy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <script src="solve.js" defer></script>
+    <script src="words.js" defer></script>
+
+
+    <audio controls src="clock.mp3"></audio> <input type="text" id="check" placeholder = "Word to check"> <button onclick="check()" id="check-btn">Check</button>
+    <br>
+    
+    <input type="text" id="nums" placeholder="Numbers Round (nums, target: space sep.)">
+    <br>
+    <button onclick="S();">Solve</button>
+    <p id="out"></p>
+
+    <input type="text" id="letters" placeholder="Letters Round (NO SPACES)">
+    <br>
+    <button onclick="SW();">Solve</button>
+    <p id="outl"></p>
+
+</body>
+</html>

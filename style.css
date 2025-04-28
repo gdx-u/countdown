@@ -1,0 +1,16 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+input:not(#check) {
+    display: block;
+    margin-left: 16px;
+    width: calc(100% - 32px);
+    height: 48px;
+    text-align: center;
+    font-size: 24px;
+}
+
+input#check {
+    display: inline-block;
+}

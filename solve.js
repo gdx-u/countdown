@@ -4,13 +4,11 @@ let trickshot = null;
 let minim_score = null;
 let minim = null;
 
+let best_score = null;
+let best = null;
+
 let found = [];
 let out = "";
-
-function update_minim() {
-    let el = document.getElementById("out");
-    el.innerText = minim;
-}
 
 function replace(arr, a, b) {
     arr[arr.indexOf(a)] = b
@@ -57,7 +55,7 @@ function count(arr, el) {
     return c;
 }
 
-async function solve(n, target, soln = "") {
+function solve(n, target, soln = "") {
     if (n.includes(target)) {
         let parts = soln.split(", ");
         parts.pop();
@@ -84,7 +82,11 @@ async function solve(n, target, soln = "") {
         if (minim_score == null || parts.length < minim_score) {
             minim = soln.slice(0, -2);
             minim_score = parts.length;
-            update_minim();
+        }
+
+        if (best_score == null || full_heuristic(parts) > best_score) {
+            best = soln.slice(0, -2);
+            best_score = full_heuristic(parts);
         }
 
         for (let n of created) {
@@ -171,6 +173,9 @@ function S() {
     minim_score = null;
     minim = null;
     
+    best_score = null;
+    best = null;
+
     found = [];
     out = "";
     
@@ -178,7 +183,48 @@ function S() {
     let args = el.value.split(" ").map(e => parseInt(e));
     let target = args.slice(-1)[0];
     let nums = args.slice(0, -1);
-    console.log(args, target, nums, el);
     solve(nums, target);
-    document.getElementById("out").innerText = minim ? minim : ":(";
+    document.getElementById("out").innerText = best ? best : ":(";
+}
+
+function full_heuristic(parts) {
+    let sum = 0;
+    let num = 0;
+    for (let part of parts) {
+        if (part.includes("*")) {
+            let [a, b] = part.split(" * ");
+            sum += multiplication_familiarity(a, b);
+            num++;
+        }
+    }
+
+    return num ? sum / num : 1.0;
+}
+
+function multiplication_familiarity(a, b) {
+    if (a > b) [a, b] = [b, a]  
+    let product = a * b;
+  
+    let table_familiarity = {
+        1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0,
+        6: 0.9, 7: 0.9, 8: 0.8, 9: 0.8, 10: 1.0,
+        11: 0.9, 12: 0.9, 13: 0.6, 14: 0.5, 15: 0.9,
+        16: 0.5, 17: 0.4, 18: 0.5, 19: 0.3,
+        20: 0.9, 25: 0.95, 50: 0.95, 75: 0.85, 100: 1.0
+    };
+  
+    let mental_trick_numbers = new Set([11, 25, 50, 100]);
+  
+    let fam_a = table_familiarity[a] || 0.3;
+    let fam_b = table_familiarity[b] || 0.3;
+    let familiarity = Math.max(fam_a, fam_b);
+  
+    let trick_bonus = (mental_trick_numbers.has(a) || mental_trick_numbers.has(b)) ? 0.2 : 0.0;
+  
+    let nice_score = 0.5;
+
+    if (product % 100 === 0) nice_score = 1.0;
+    else if (product % 10 === 0 || product % 10 === 5) nice_score = 0.9;
+  
+    return familiarity * 0.6 + nice_score * 0.7 + trick_bonus;
 }

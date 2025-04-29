@@ -159,6 +159,15 @@ function solve(n, target, soln = "") {
 }
 
 function S() {
+    trickshot_score = null;
+    trickshot = null;
+    
+    minim_score = null;
+    minim = null;
+    
+    found = [];
+    out = "";
+    
     let el = document.getElementById("nums")
     let args = el.value.split(" ").map(e => parseInt(e));
     let target = args.slice(-1)[0];

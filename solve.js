@@ -10,6 +10,25 @@ let best = null;
 let found = [];
 let out = "";
 
+function has_redundancy(input) {
+    const lines = input.trim().split(', ').map(line => {
+        const m = line.match(/^\s*(-?\d+)\s*-\s*(-?\d+)\s*=\s*(-?\d+)\s*$/);
+        return m && {
+            a: Number(m[1]),
+            b: Number(m[2]),
+            r: Number(m[3])
+        };
+    }).filter(Boolean);
+  
+    for (let i = 0; i < lines.length; i++) {
+        for (let j = 0; j < lines.length; j++) {
+            if (i !== j && lines[i].r == lines[j].b && lines[j].r == lines[i].a) return true;
+        }
+    }
+
+    return false;
+}
+
 function replace(arr, a, b) {
     arr[arr.indexOf(a)] = b
 }
@@ -64,6 +83,10 @@ function solve(n, target, soln = "") {
             return;
         }
 
+        if (has_redundancy(soln)) {
+            return;
+        }
+
         let created = parts.slice(0, -1).map(part => part.split('= ')[1]);
 
         let used = [];
@@ -84,9 +107,13 @@ function solve(n, target, soln = "") {
             minim_score = parts.length;
         }
 
-        if (best_score == null || full_heuristic(parts) > best_score) {
+        let heuristic = full_heuristic(parts);
+        if (best_score == null || heuristic > best_score) {
             best = soln.slice(0, -2);
-            best_score = full_heuristic(parts);
+            best_score = heuristic;
+        } else if (heuristic == best_score && soln.slice(0, -2).length < best.length) {
+            best = soln.slice(0, -2);
+            best_score = heuristic;
         }
 
         for (let n of created) {

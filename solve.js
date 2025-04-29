@@ -181,8 +181,6 @@ function solve(n, target, soln = "") {
             new_n.splice(new_n.indexOf(b), 1);
 
             solve(new_n, target, soln + `${a} ${op} ${b} = ${res}, `);
-        } else if (pair.includes(res)) {
-            console.log(pair, res);
         }
     }
 }

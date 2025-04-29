@@ -1,8 +1,9 @@
 words = [];
 
 async function load_words() {
-    let file = await fetch("list.txt");
+    let file = await fetch("enc.txt");
     let text = await file.text();
+    text = atob(text);
     words = text.split("\n").map(e => e.replace(/\r$/, ""));
 }
 

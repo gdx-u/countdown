@@ -73,10 +73,10 @@ function solve(n, target, soln = "") {
             }
         }
 
-        let max_n = Math.max(created.map(e => parseInt(e)));
+        let max_n = Math.max(...created.map(e => parseInt(e)));
         if (trickshot_score == null || max_n > trickshot_score) {
-            trickshot_score = max_n;
             trickshot = soln.slice(0, -2);
+            trickshot_score = max_n;
         }
 
         if (minim_score == null || parts.length < minim_score) {
@@ -117,7 +117,7 @@ function solve(n, target, soln = "") {
     for (let a of n) {
         let j = 0;
         for (let b of n) {
-            if (i != j) pairs.push([a, b]);
+            if (i < j) pairs.push([a, b]);
             j++;
         }
         i++;
@@ -127,6 +127,7 @@ function solve(n, target, soln = "") {
     for (let pair of pairs) {
         for (let op of "+-*/") {
             calcs.push([pair, op]);
+            if (op == "-" || op == "/") calcs.push([reversed(pair), op])
         }
     }
 
@@ -145,23 +146,16 @@ function solve(n, target, soln = "") {
             } else continue
         }
 
-        let valid = true;
-        for (let part of pair) {
-            if (count(n, part) < count(pair, part)) {
-                valid = false;
-            }
-        }
-
-        if (!valid) continue;
-
         let res = operators[op](a, b);
-        if (res == parseInt(res) && res > 0 && !n.includes(res)) {
+        if (res == parseInt(res) && res > 0 && !pair.includes(res)) {
             res = parseInt(res);
             let new_n = n.slice();
             replace(new_n, a, res);
             new_n.splice(new_n.indexOf(b), 1);
 
             solve(new_n, target, soln + `${a} ${op} ${b} = ${res}, `);
+        } else if (pair.includes(res)) {
+            console.log(pair, res);
         }
     }
 }
@@ -185,6 +179,7 @@ function S() {
     let nums = args.slice(0, -1);
     solve(nums, target);
     document.getElementById("out").innerText = best ? best : ":(";
+    document.getElementById("out-trickshot").innerText = best ? `Trickshot: ${trickshot}` : ":(";
 }
 
 function full_heuristic(parts) {
@@ -192,13 +187,17 @@ function full_heuristic(parts) {
     let num = 0;
     for (let part of parts) {
         if (part.includes("*")) {
-            let [a, b] = part.split(" * ");
+            let a = part.split(" * ")[0];
+            let b = part.split(" * ")[1];
+            b = b.split(" =")[0];
+            a = parseInt(a);
+            b = parseInt(b);
             sum += multiplication_familiarity(a, b);
             num++;
         }
     }
 
-    return num ? sum / num : 1.0;
+    return num ? sum / (num) : 1.0;
 }
 
 function multiplication_familiarity(a, b) {
@@ -213,18 +212,18 @@ function multiplication_familiarity(a, b) {
         20: 0.9, 25: 0.95, 50: 0.95, 75: 0.85, 100: 1.0
     };
   
-    let mental_trick_numbers = new Set([11, 25, 50, 100]);
+    // let mental_trick_numbers = new Set([11, 25, 50, 100]);
   
     let fam_a = table_familiarity[a] || 0.3;
     let fam_b = table_familiarity[b] || 0.3;
     let familiarity = Math.max(fam_a, fam_b);
-  
-    let trick_bonus = (mental_trick_numbers.has(a) || mental_trick_numbers.has(b)) ? 0.2 : 0.0;
-  
+    
     let nice_score = 0.5;
 
     if (product % 100 === 0) nice_score = 1.0;
     else if (product % 10 === 0 || product % 10 === 5) nice_score = 0.9;
+
+    if (product > 1000) nice_score = 0;
   
-    return familiarity * 0.6 + nice_score * 0.7 + trick_bonus;
+    return familiarity * 0.6 + nice_score * 0.7;
 }

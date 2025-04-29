@@ -7,6 +7,11 @@ let minim = null;
 let found = [];
 let out = "";
 
+function update_minim() {
+    let el = document.getElementById("out");
+    el.innerText = minim;
+}
+
 function replace(arr, a, b) {
     arr[arr.indexOf(a)] = b
 }
@@ -79,6 +84,7 @@ function solve(n, target, soln = "") {
         if (minim_score == null || parts.length < minim_score) {
             minim = soln.slice(0, -2);
             minim_score = parts.length;
+            update_minim();
         }
 
         for (let n of created) {

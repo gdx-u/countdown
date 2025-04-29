@@ -57,7 +57,7 @@ function count(arr, el) {
     return c;
 }
 
-function solve(n, target, soln = "") {
+async function solve(n, target, soln = "") {
     if (n.includes(target)) {
         let parts = soln.split(", ");
         parts.pop();

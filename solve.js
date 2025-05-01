@@ -253,9 +253,16 @@ function add_sub_familiarity(a, b) {
     else if (b % 10 === 0 || b % 10 === 5) nice_score_b = 0.6;
 
     let finishing_bonus = 0.7 * ((a - b) % 50 == 0);
-    let small_bonus = 1 * (a <= 20 && b <= 20);
+    let small_bonus = 1 * (a <= 20 || b <= 20);
+    let xs_bonus = 1 * (a <= 10 || b <= 10);
 
-    return nice_score_a + nice_score_b + finishing_bonus + small_bonus;
+    let full_score = nice_score_a
+                    + nice_score_b
+                    + finishing_bonus
+                    + small_bonus
+                    + xs_bonus;
+
+    return full_score;
 }
 
 function division_familiarity(a, b) {

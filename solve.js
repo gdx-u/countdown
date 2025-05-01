@@ -219,29 +219,63 @@ function full_heuristic(parts) {
             b = parseInt(b);
             sum += multiplication_familiarity(a, b);
             num++;
+        } else if (part.includes("+") || part.includes("-")) {
+            let separator = part.includes("+") ? "+" : "-";
+            let a = part.split(` ${separator} `)[0];
+            let b = part.split(` ${separator} `)[1];
+            b = b.split(" =")[0];
+            a = parseInt(a);
+            b = parseInt(b);
+            sum += add_sub_familiarity(a, b);
+            num++;
+        } else if (part.includes("/")) {
+            let a = part.split(" / ")[0];
+            let b = part.split(" / ")[1];
+            b = b.split(" =")[0];
+            a = parseInt(a);
+            b = parseInt(b);
+            sum += division_familiarity(a, b);
+            num++;
         }
     }
 
     return num ? sum / (num) : 1.0;
 }
 
-function multiplication_familiarity(a, b) {
-    if (a > b) [a, b] = [b, a]  
+function add_sub_familiarity(a, b) {
+    let nice_score_a = 0;
+    let nice_score_b = 0;
+
+    if (a % 100 === 0) nice_score_a = 1.0;
+    else if (a % 10 === 0 || a % 10 === 5) nice_score_a = 0.6;
+
+    if (b % 100 === 0) nice_score_b = 1.0;
+    else if (b % 10 === 0 || b % 10 === 5) nice_score_b = 0.6;
+
+    let finishing_bonus = 0.7 * ((a - b) % 50 == 0);
+
+    return nice_score_a + nice_score_b + finishing_bonus;
+}
+
+function division_familiarity(a, b) {
+    return multiplication_familiarity(a, b, true);
+}
+
+function multiplication_familiarity(a, b, strict) {
+    if (a > b && !strict) [a, b] = [b, a];
     let product = a * b;
   
     let table_familiarity = {
-        1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0,
+        2: 1.0, 3: 1.0, 4: 1.0, 5: 1.0,
         6: 0.9, 7: 0.9, 8: 0.8, 9: 0.8, 10: 1.0,
-        11: 0.9, 12: 0.9, 13: 0.6, 14: 0.5, 15: 0.9,
-        16: 0.5, 17: 0.4, 18: 0.5, 19: 0.3,
+        11: 0.9, 12: 0.7, 13: 0.3, 14: 0.4, 15: 0.8,
+        16: 0.4, 17: 0.2, 18: 0.5, 19: 0.2,
         20: 0.9, 25: 0.95, 50: 0.95, 75: 0.85, 100: 1.0
     };
-  
-    // let mental_trick_numbers = new Set([11, 25, 50, 100]);
-  
+    
     let fam_a = table_familiarity[a] || 0.3;
     let fam_b = table_familiarity[b] || 0.3;
-    let familiarity = Math.max(fam_a, fam_b);
+    let familiarity = strict ? fam_b : Math.max(fam_a, fam_b);
     
     let nice_score = 0.5;
 

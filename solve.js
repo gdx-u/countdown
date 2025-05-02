@@ -87,16 +87,16 @@ function solve(n, target, soln = "") {
             return;
         }
 
-        let created = parts.slice(0, -1).map(part => part.split('= ')[1]);
-        for (let n of created) {
-            if (!used.includes(n)) return
-        }
-
         let used = [];
         for (let part of parts) {
             for (let i = 0; i < 2; i++) {
                 used.push(part.split(" =")[0].split(" ")[i * 2]);
             }
+        }
+        
+        let created = parts.slice(0, -1).map(part => part.split('= ')[1]);
+        for (let n of created) {
+            if (!used.includes(n)) return
         }
 
         let max_n = Math.max(...created.map(e => parseInt(e)));

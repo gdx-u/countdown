@@ -88,6 +88,9 @@ function solve(n, target, soln = "") {
         }
 
         let created = parts.slice(0, -1).map(part => part.split('= ')[1]);
+        for (let n of created) {
+            if (!used.includes(n)) return
+        }
 
         let used = [];
         for (let part of parts) {
@@ -114,10 +117,6 @@ function solve(n, target, soln = "") {
         } else if (heuristic == best_score && soln.slice(0, -2).length < best.length) {
             best = soln.slice(0, -2);
             best_score = heuristic;
-        }
-
-        for (let n of created) {
-            if (!used.includes(n)) return
         }
 
         found.push(sorted(parts));
@@ -256,11 +255,11 @@ function add_sub_familiarity(a, b) {
     let small_bonus = 1 * (a <= 20 || b <= 20);
     let xs_bonus = 1 * (a <= 10 || b <= 10);
 
-    let full_score = nice_score_a
-                    + nice_score_b
-                    + finishing_bonus
-                    + small_bonus
-                    + xs_bonus;
+    let full_score =    nice_score_a
+                   +    nice_score_b
+                   + finishing_bonus
+                   +     small_bonus
+                   +        xs_bonus;
 
     return full_score;
 }
